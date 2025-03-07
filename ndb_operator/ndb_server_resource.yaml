@@ -1,0 +1,22 @@
+
+apiVersion: ndb.nutanix.com/v1alpha1
+kind: NDBServer
+metadata:
+  labels:
+    app.kubernetes.io/name: ndbserver
+    app.kubernetes.io/instance: ndbserver
+    app.kubernetes.io/part-of: ndb-operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: ndb-operator
+  # This name that will be used within the kubernetes cluster
+  name: ndb
+spec:
+  # Credentials secret name for NDB installation
+  # data: username, password,
+  # stringData: ca_certificate
+  credentialSecret: your-ndb-secret
+  # The NDB Server
+  server: https://10.38.142.150:8443/era/v0.9
+  # Set to true to skip SSL verification, default: false.
+  skipCertificateVerification: true
+

@@ -1,0 +1,60 @@
+apiVersion: ndb.nutanix.com/v1alpha1
+kind: Database
+metadata:
+  # This name that will be used within the kubernetes cluster
+  name: db
+spec:
+  # Name of the NDBServer resource created earlier
+  ndbRef: ndb
+  isClone: false
+  # Database instance specific details (that is to be provisioned)
+  databaseInstance:
+    # Cluster id of the cluster where the Database has to be provisioned
+    # Can be fetched from the GET /clusters endpoint
+    clusterId: "e32f23d2-9a5b-47f5-8893-e22b13f3ae53"
+    # The database instance name on NDB
+    name: "postgresnkpinstance"
+    # The description of the database instance
+    description: "Database Description"
+    # Names of the databases on that instance
+    databaseNames:
+      - postgresnkpdb
+    # Credentials secret name for NDB installation
+    # data: password, ssh_public_key
+    credentialSecret: your-db-secret
+    size: 10
+    timezone: "UTC"
+    type: postgres
+
+    # You can specify any (or none) of these types of profiles: compute, software, network, dbParam
+    # If not specified, the corresponding Out-of-Box (OOB) profile will be used wherever applicable
+    # Name is case-sensitive. ID is the UUID of the profile. Profile should be in the READY state
+    # id & name are optional. If none provided, OOB may be resolved to any profile of that type
+    profiles:
+      compute:
+        id: "199c1fab-b6a9-4b56-95bb-7d2f3ee6e6cc"
+        name: "DEFAULT_OOB_SMALL_COMPUTE"
+      # A Software profile is a mandatory input for closed-source engines: SQL Server & Oracle
+      software:
+        name: "POSTGRES_15.6_ROCKY_LINUX_8_OOB"
+        id: "fdc845bb-48d9-4bd0-bf42-865256b439cd"
+      network:
+        name: "DEFAULT_OOB_POSTGRESQL_NETWORK"
+        id: "1b9e2aa2-830c-4570-8548-e2b5130fdfa6"
+      dbParam:
+        name: "DEFAULT_POSTGRES_PARAMS"
+        id: "0e49145c-17bc-4e0a-8e5b-f985f4e14170"
+      # Only applicable for MSSQL databases
+      dbParamInstance:
+        name: ""
+        id: ""
+    timeMachine:                        # Optional block, if removed the SLA defaults to NONE
+      sla : "DEFAULT_OOB_BRASS_SLA" 
+      dailySnapshotTime:   "12:34:56"   # Time for daily snapshot in hh:mm:ss format
+      snapshotsPerDay:     4            # Number of snapshots per day
+      logCatchUpFrequency: 90           # Frequency (in minutes)
+      weeklySnapshotDay:   "WEDNESDAY"  # Day of the week for weekly snapshot
+      monthlySnapshotDay:  24           # Day of the month for monthly snapshot
+      quarterlySnapshotMonth: "Jan"     # Start month of the quarterly snapshot
+    additionalArguments:                # Optional block, can specify additional arguments that are unique to database engines.
+      listener_port: "8443"
